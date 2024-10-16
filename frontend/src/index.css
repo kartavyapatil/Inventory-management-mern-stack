@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*{
+    /* background-color: rgb(251, 251, 251); */
+}
+
+.p-dialog-footer{
+    display: flex;
+    justify-content: end;
+    gap: 23px;
+}
+.p-inputtext{
+    border: 2px solid;
+}
