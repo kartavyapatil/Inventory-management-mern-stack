@@ -12,11 +12,11 @@ const app =express()
 // }))
 
 
-// app.use(cors({
-//     origin: 'http://localhost:5173', // Allow requests from this origin
-//     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-//     credentials: true // if your frontend makes requests with cookies
-//   }));
+app.use(cors({
+    origin: 'https://inventory-management-kartavyapatils-projects.vercel.app', // Allow requests from this origin
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true // if your frontend makes requests with cookies
+  }));
 app.use(express.json({limit:'10mb'}))
 app.use(express.urlencoded({extended:true}))
 app.use(express.static("public"))
