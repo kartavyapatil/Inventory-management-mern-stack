@@ -15,7 +15,7 @@ function App() {
   const selector= useSelector(userslicepath)
   const fetchdata = async (token) => {
     try {
-      const { data } = await axios.get("http://localhost:8000/api/v1" +"/auth/profile", {
+      const { data } = await axios.get(import.meta.env.VITE_BACKEND_URL +"/auth/profile", {
         headers: {
           'Authorization': 'Bearer ' + token
         }
