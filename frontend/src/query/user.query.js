@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const consumerApi = createApi({
     reducerPath: 'consumerApi',
-    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:8000/api/v1' }),
+    baseQuery: fetchBaseQuery({ baseUrl: import.meta.env.VITE_BACKEND_URL}),
     tagTypes:['GetAllConsumer',"GetAllConsumerdetails"],
     endpoints: (builder) => ({
         registerconsumer: builder.mutation({
