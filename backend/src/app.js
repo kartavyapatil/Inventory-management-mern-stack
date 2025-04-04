@@ -13,7 +13,7 @@ const app =express()
 
 
 app.use(cors({
-    origin: 'https://inventory-management-kartavyapatils-projects.vercel.app', // Allow requests from this origin
+    origin: 'https://inventory-management-ruddy-chi.vercel.app', // Allow requests from this origin
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true // if your frontend makes requests with cookies
   }));
