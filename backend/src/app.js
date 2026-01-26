@@ -5,17 +5,13 @@ import cookieparser from "cookie-parser"
 import route from "./routes/index.js"
 import ApiError from "./utils/ApiError.js";
 const app =express()
-
-
 // app.use(cors({
 //     origin:process.env.CORS_ORIGIN, 
 // }))
-
-
 app.use(cors({
-    origin: 'https://inventory-management-ruddy-chi.vercel.app', // Allow requests from this origin
+    origin: process.env.CORS_ORIGIN,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true // if your frontend makes requests with cookies
+    credentials: true 
   }));
 app.use(express.json({limit:'10mb'}))
 app.use(express.urlencoded({extended:true}))
