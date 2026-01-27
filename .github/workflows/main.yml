@@ -42,12 +42,8 @@ jobs:
       - name: Start backend with PM2
         working-directory: ./backend
         run: |
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-          nvm use --lts
-        
-          pm2 restart backend || pm2 start npm --name backend -- start
-          pm2 save
+          /home/ubuntu/.nvm/versions/node/v20.12.0/bin/pm2 restart backend || /home/ubuntu/.nvm/versions/node/v20.12.0/bin/pm2 start npm --name backend -- start
+          /home/ubuntu/.nvm/versions/node/v20.12.0/bin/pm2 save
 
       # ------------------------------
       # FRONTEND SETUP
