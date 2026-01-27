@@ -41,7 +41,7 @@ jobs:
 
       - name: Start backend with PM2
         working-directory: ./backend
-        run: pm2 restart backend || pm2 start index.js --name backend
+        run: pm2 restart backend || pm2 start npm --name backend -- start
 
       # ------------------------------
       # FRONTEND SETUP
