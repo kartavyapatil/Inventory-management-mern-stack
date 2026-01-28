@@ -1,73 +1,95 @@
-name: Deploy Fullstack App on EC2
+name: Deploy Fullstack App
+
 on:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
 
 jobs:
-  deploy:
-    runs-on: self-hosted
-
-    strategy:
-      matrix:
-        node-version: [20.x]
-
+  # JOB 1: BUILD FRONTEND (Runs on GitHub's powerful servers)
+  build-frontend:
+    runs-on: ubuntu-latest  # <--- This uses GitHub's computer, not yours
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: '20'
           cache: 'npm'
-          cache-dependency-path: |
-            backend/package-lock.json
-            frontend/package-lock.json
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Create .env
+        working-directory: ./frontend
+        run: |
+          touch .env
+          echo "${{ secrets.PROD_FRONTEND_ENV }}" > .env
+
+      - name: Build
+        working-directory: ./frontend
+        run: npm run build
+
+      # Save the 'dist' folder to move it to the next job
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: ./frontend/dist
+
+  # JOB 2: DEPLOY (Runs on your EC2)
+  deploy-to-ec2:
+    needs: build-frontend  # Wait for build to finish
+    runs-on: self-hosted   # <--- Now we switch to your server
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       # ------------------------------
-      # BACKEND SETUP
+      # BACKEND (Still needs to run on server)
       # ------------------------------
-      - name: Install backend dependencies
+      - name: Setup Node for Backend
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install Backend Dependencies
         working-directory: ./backend
-        run: npm install
+        run: npm install --production # Save space by skipping dev dependencies
 
-      - name: Create backend .env file
+      - name: Create Backend .env
         working-directory: ./backend
         run: |
           touch .env
           echo "${{ secrets.PROD_BACKEND_ENV }}" > .env
 
-      - name: Start backend with PM2
+      - name: Restart Backend (PM2)
         working-directory: ./backend
         run: |
           /home/ubuntu/.nvm/versions/node/v20.12.0/bin/pm2 restart backend || /home/ubuntu/.nvm/versions/node/v20.12.0/bin/pm2 start npm --name backend -- start
           /home/ubuntu/.nvm/versions/node/v20.12.0/bin/pm2 save
 
       # ------------------------------
-      # FRONTEND SETUP
+      # FRONTEND (Just download and copy!)
       # ------------------------------
-      - name: Clean npm cache & remove existing dependencies
-        working-directory: ./frontend
+      - name: Download Frontend Build
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: ./frontend-dist
+
+      - name: Deploy to Nginx
         run: |
-          rm -rf node_modules package-lock.json
-          npm cache clean --force
-
-      - name: Install frontend dependencies
-        working-directory: ./frontend
-        run: npm install
-
-      - name: Create frontend .env file
-        working-directory: ./frontend
-        run: |
-          touch .env
-          echo "${{ secrets.PROD_FRONTEND_ENV }}" > .env
-
-      - name: Build frontend
-        working-directory: ./frontend
-        run: npm run build
-
-      - name: Deploy frontend to Nginx
-        run: |
+          # Clean old files
           sudo rm -rf /var/www/html/*
-          sudo cp -r ./frontend/dist/* /var/www/html/
+          # Copy new files from the downloaded artifact
+          sudo cp -r ./frontend-dist/* /var/www/html/
+          # Restart Nginx to be safe
+          sudo systemctl reload nginx
+          # Cleanup artifact to save space
+          rm -rf ./frontend-dist
