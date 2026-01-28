@@ -67,13 +67,13 @@ jobs:
         run: |
           touch .env
           echo "${{ secrets.PROD_BACKEND_ENV }}" > .env
-
+          
       - name: Restart Backend (PM2)
         working-directory: ./backend
         run: |
-          /home/ubuntu/.nvm/versions/node/v20.12.0/bin/pm2 restart backend || /home/ubuntu/.nvm/versions/node/v20.12.0/bin/pm2 start npm --name backend -- start
-          /home/ubuntu/.nvm/versions/node/v20.12.0/bin/pm2 save
-
+          export PATH=$HOME/.nvm/versions/node/v20.12.0/bin:$PATH
+           /home/ubuntu/.nvm/versions/node/v20.12.0/bin/pm2 start npm --name backend -- start ||  /home/ubuntu/.nvm/versions/node/v20.12.0/bin/pm2 restart backend
+           /home/ubuntu/.nvm/versions/node/v20.12.0/bin/pm2 save
       # ------------------------------
       # FRONTEND (Just download and copy!)
       # ------------------------------
