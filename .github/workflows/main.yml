@@ -28,6 +28,13 @@ jobs:
         run: |
           touch .env
           echo "${{ secrets.PROD_FRONTEND_ENV }}" > .env
+      - name: Debug env file
+        working-directory: ./backend
+        run: |
+          echo "ENV file exists?"
+          ls -la .env
+          echo "ENV keys (values hidden):"
+          sed 's/=.*$/=****/' .env
 
       - name: Build
         working-directory: ./frontend
