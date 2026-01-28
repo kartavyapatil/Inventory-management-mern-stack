@@ -1,6 +1,5 @@
-import React from 'react'
+
 import { FaInstagram, FaFacebook, FaTiktok } from 'react-icons/fa';
-import image from "../assets/texture-dark-background-purple-1920x1200-3086.jpg"
 const Footer = () => {
   return (
     <div>
