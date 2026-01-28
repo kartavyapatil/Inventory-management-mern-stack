@@ -1,5 +1,4 @@
 name: Deploy Fullstack App on EC2
-
 on:
   push:
     branches:
