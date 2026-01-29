@@ -29,9 +29,7 @@ jobs:
       - name: Create Frontend .env
         working-directory: ./frontend
         run: |
-          cat << 'EOF' > .env
-          ${{ secrets.PROD_FRONTEND_ENV }}
-          EOF
+           printf "%s\n" "${{ secrets.PROD_FRONTEND_ENV }}" > .env
 
       - name: Debug Frontend env (keys only)
         working-directory: ./frontend
@@ -53,7 +51,7 @@ jobs:
   deploy-to-ec2:
     needs: build-frontend
     runs-on: self-hosted
-
+    environment: production
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -74,13 +72,15 @@ jobs:
       - name: Create Backend .env
         working-directory: ./backend
         run: |
-          cat << 'EOF' > .env
-          ${{ secrets.PROD_BACKEND_ENV }}
-          EOF
+           printf "%s\n" "${{ secrets.PROD_BACKEND_ENV }}" > .env
 
-      - name: Debug Backend env (keys only)
+      - name: HARD DEBUG
         working-directory: ./backend
-        run: sed 's/=.*$/=****/' .env
+        run: |
+          echo "Bytes:"
+          wc -c .env
+          echo "Lines:"
+          wc -l .env
 
       - name: Restart Backend with PM2
         working-directory: ./backend
