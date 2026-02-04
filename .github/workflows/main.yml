@@ -85,6 +85,7 @@ jobs:
         working-directory: ./backend
         run: |
           export PATH=$HOME/.nvm/versions/node/v20.12.0/bin:$PATH
+           /home/ubuntu/.nvm/versions/node/v20.12.0/bin/pm2 delete backend || true
           /home/ubuntu/.nvm/versions/node/v20.12.0/bin/pm2 start npm --name backend -- start || /home/ubuntu/.nvm/versions/node/v20.12.0/bin/pm2 restart backend 
           /home/ubuntu/.nvm/versions/node/v20.12.0/bin/pm2 save
 
